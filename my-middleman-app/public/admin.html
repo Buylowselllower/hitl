@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Operator Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #1e1e2e; color: #fff; padding: 40px; }
+    .card { background: #2b2b3d; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid #ff3333; }
+    input[type="text"] { width: 65%; padding: 10px; border: 1px solid #444; border-radius: 4px; background: #181825; color: #fff; font-size: 14px; }
+    button { padding: 10px 20px; background: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    button:hover { background: #218838; }
+    .input-highlight { color: #f9e2af; font-weight: bold; font-size: 18px; }
+    .audio-notice { background: #4a1515; padding: 8px 12px; border-radius: 4px; display: inline-block; font-size: 13px; color: #ff9999; margin-bottom: 15px; border: 1px solid #ff3333; }
+  </style>
+</head>
+<body>
+
+  <h1>Operator Dashboard</h1>
+  <div class="audio-notice">🚨 1-Second Loud Alarm Active. Click anywhere on this page once after loading!</div>
+  <p>Incoming user requests will appear below. Auto-refreshes every 2 seconds.</p>
+  <hr style="border-color: #444; margin-bottom: 30px;">
+
+  <div id="taskList">Checking for requests...</div>
+
+  <script>
+    let knownTaskIds = new Set();
+    let isFirstLoad = true;
+
+    // Single 1-Second Loud Alarm
+    function playEmergencyAlarm() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.value = 900;
+
+        gainNode.gain.setValueAtTime(0.9, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + 1.0);
+
+      } catch (err) {
+        console.log('Audio playback waiting for user interaction on page.');
+      }
+    }
+
+    async function fetchRequests() {
+      // Pause refresh if operator is typing in an input field
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+        return;
+      }
+
+      try {
+        // Relative API route
+        const res = await fetch('/api/admin/tasks');
+        const tasks = await res.json();
+        const container = document.getElementById('taskList');
+
+        const currentTaskIds = new Set(tasks.map(t => t.id));
+
+        if (!isFirstLoad) {
+          let hasNewRequest = false;
+          for (let id of currentTaskIds) {
+            if (!knownTaskIds.has(id)) {
+              hasNewRequest = true;
+              break;
+            }
+          }
+
+          if (hasNewRequest) {
+            playEmergencyAlarm();
+          }
+        } else {
+          isFirstLoad = false;
+        }
+
+        knownTaskIds = currentTaskIds;
+
+        if (tasks.length === 0) {
+          container.innerHTML = '<p style="color: #888;">No pending requests right now.</p>';
+          return;
+        }
+
+        // Save typed text
+        const savedValues = {};
+        document.querySelectorAll('input[id^="link_"]').forEach(input => {
+          if (input.value) savedValues[input.id] = input.value;
+        });
+
+        container.innerHTML = tasks.map(t => `
+          <div class="card">
+            <p><strong>Request ID:</strong> ${t.id}</p>
+            <p>User Color Requested: <span class="input-highlight">${t.input}</span></p>
+            <div style="margin-top: 10px;">
+              <input type="text" id="link_${t.id}" placeholder="Paste result link here...">
+              <button onclick="deliverLink('${t.id}')">Deliver Link to User</button>
+            </div>
+          </div>
+        `).join('');
+
+        // Restore typed text
+        Object.keys(savedValues).forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = savedValues[id];
+        });
+
+      } catch (err) {
+        document.getElementById('taskList').innerHTML = '<p style="color: red;">Failed to connect to Middleman server.</p>';
+      }
+    }
+
+    async function deliverLink(id) {
+      const linkInput = document.getElementById(`link_${id}`).value.trim();
+      if (!linkInput) {
+        alert('Please paste a link first!');
+        return;
+      }
+
+      // Relative API route
+      await fetch('/api/admin/fulfill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId: id, generatedLink: linkInput })
+      });
+
+      fetchRequests();
+    }
+
+    setInterval(fetchRequests, 2000);
+    fetchRequests();
+  </script>
+
+</body>
+</html>
